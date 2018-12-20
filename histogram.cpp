@@ -8,11 +8,19 @@
 unsigned int * histogram(unsigned int *image_data, unsigned int _size) {
 	cl_int error_num;
 	cl_device_id device_id;
+	cl_context context;
 
 	// Get a GPU device ID
 	error_num = clGetDeviceIDs(NULL, CL_DEVICE_TYPE_GPU, 1, &device_id, NULL);
 	if (error_num != CL_SUCCESS) {
 		std::cout << "Fail to get device ID\n";
+		exit(EXIT_FAILURE);
+	}
+
+	// Create a context with the GPU device we got above
+	context = clCreateContext(NULL, 1, &device_id, NULL, NULL, &error_num);
+	if (error_num != CL_SUCCESS) {
+		std::cout << "Fail to create context\n";
 		exit(EXIT_FAILURE);
 	}
 
