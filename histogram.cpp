@@ -5,11 +5,35 @@
 #include <iostream>
 #include <CL/cl.h>
 
+const char *kernel_source_filename = "histogram.cl";
+
+char* readKernelSource(const char *filename) {
+	size_t size;
+	char *source;
+
+	FILE *f = fopen(filename, "r");
+	if (!f) {
+		std::cout << "Cannot open kernel source file " << kernel_source_filename << "\n";
+		exit(EXIT_FAILURE);
+	}
+	// Get file size and allocate space
+	fseek(f, 0, SEEK_END);
+	size = ftell(f);
+	source = new char[size + 1];
+
+	rewind(f);
+	fread(source, sizeof(char), size, f);
+	fclose(f);
+	return source;
+}
+
 unsigned int * histogram(unsigned int *image_data, unsigned int _size) {
 	cl_int error_num;
 	cl_device_id device_id;
 	cl_context context;
 	cl_command_queue command_queue;
+	char *kernel_source;
+	cl_program program;
 
 	// Get a GPU device ID
 	error_num = clGetDeviceIDs(NULL, CL_DEVICE_TYPE_GPU, 1, &device_id, NULL);
@@ -29,6 +53,14 @@ unsigned int * histogram(unsigned int *image_data, unsigned int _size) {
 	command_queue = clCreateCommandQueueWithProperties(context, device_id, NULL, &error_num);
 	if (error_num != CL_SUCCESS) {
 		std::cout << "Fail to create command queue\n";
+		exit(EXIT_FAILURE);
+	}
+
+	// Create a program from external kernel source code
+	kernel_source = readKernelSource(kernel_source_filename);
+	program = clCreateProgramWithSource(context, 1, (const char **)&kernel_source, NULL, &error_num);
+	if (error_num != CL_SUCCESS) {
+		std::cout << "Fail to create program with source\n";
 		exit(EXIT_FAILURE);
 	}
 
