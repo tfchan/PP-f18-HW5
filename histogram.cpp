@@ -3,8 +3,19 @@
 #include "string.h"
 #include <fstream>
 #include <iostream>
+#include <CL/cl.h>
 
 unsigned int * histogram(unsigned int *image_data, unsigned int _size) {
+	cl_int error_num;
+	cl_device_id device_id;
+
+	// Get a GPU device ID
+	error_num = clGetDeviceIDs(NULL, CL_DEVICE_TYPE_GPU, 1, &device_id, NULL);
+	if (error_num != CL_SUCCESS) {
+		std::cout << "Fail to get device ID\n";
+		exit(EXIT_FAILURE);
+	}
+
 	unsigned int *img = image_data;
 	unsigned int *ref_histogram_results;
 	unsigned int *ptr;
