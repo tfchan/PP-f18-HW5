@@ -9,6 +9,7 @@ unsigned int * histogram(unsigned int *image_data, unsigned int _size) {
 	cl_int error_num;
 	cl_device_id device_id;
 	cl_context context;
+	cl_command_queue command_queue;
 
 	// Get a GPU device ID
 	error_num = clGetDeviceIDs(NULL, CL_DEVICE_TYPE_GPU, 1, &device_id, NULL);
@@ -21,6 +22,13 @@ unsigned int * histogram(unsigned int *image_data, unsigned int _size) {
 	context = clCreateContext(NULL, 1, &device_id, NULL, NULL, &error_num);
 	if (error_num != CL_SUCCESS) {
 		std::cout << "Fail to create context\n";
+		exit(EXIT_FAILURE);
+	}
+
+	// Create a command queue with the device in the context
+	command_queue = clCreateCommandQueueWithProperties(context, device_id, NULL, &error_num);
+	if (error_num != CL_SUCCESS) {
+		std::cout << "Fail to create command queue\n";
 		exit(EXIT_FAILURE);
 	}
 
