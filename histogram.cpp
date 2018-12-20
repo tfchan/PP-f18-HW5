@@ -20,6 +20,7 @@ char* readKernelSource(const char *filename) {
 	fseek(f, 0, SEEK_END);
 	size = ftell(f);
 	source = new char[size + 1];
+	source[size] = '\0';
 
 	rewind(f);
 	fread(source, sizeof(char), size, f);
