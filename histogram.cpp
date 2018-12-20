@@ -48,21 +48,25 @@ unsigned int readInput(unsigned int **image, const char *filename) {
 	return input_size;
 }
 
+void writeResult(unsigned int *result, const char *filename) {
+	std::ofstream outFile(filename, std::ios_base::out);
+	for(unsigned int i = 0; i < 256 * 3; ++i) {
+		if (i % 256 == 0 && i != 0)
+			outFile << std::endl;
+		outFile << result[i] << ' ';
+	}
+	outFile.close();
+}
+
 int main(int argc, char const *argv[]) {
 	unsigned int *image, input_size;
 	unsigned int *histogram_results;
-	std::ofstream outFile("xxxxxx.out", std::ios_base::out);
 
 	input_size = readInput(&image, "input");
 
 	histogram_results = histogram(image, input_size);
-	for(unsigned int i = 0; i < 256 * 3; ++i) {
-		if (i % 256 == 0 && i != 0)
-			outFile << std::endl;
-		outFile << histogram_results[i]<< ' ';
-	}
 
-	outFile.close();
+	writeResult(histogram_results, "0756002.out");
 
 	return 0;
 }
