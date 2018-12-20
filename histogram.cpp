@@ -36,17 +36,24 @@ unsigned int * histogram(unsigned int *image_data, unsigned int _size) {
 	return ref_histogram_results;
 }
 
-int main(int argc, char const *argv[]) {
-	unsigned int *histogram_results;
+unsigned int readInput(unsigned int* image, const char *filename) {
 	unsigned int i = 0, a, input_size;
-	std::fstream inFile("input", std::ios_base::in);
-	std::ofstream outFile("xxxxxx.out", std::ios_base::out);
-
+	std::fstream inFile(filename, std::ios_base::in);
 	inFile >> input_size;
-	unsigned int *image = new unsigned int[input_size];
-	while( inFile >> a ) {
+	image = new unsigned int[input_size];
+	while (inFile >> a) {
 		image[i++] = a;
 	}
+	inFile.close();
+	return input_size;
+}
+
+int main(int argc, char const *argv[]) {
+	unsigned int *image, input_size;
+	unsigned int *histogram_results;
+	std::ofstream outFile("xxxxxx.out", std::ios_base::out);
+
+	input_size = readInput(image, "input");
 
 	histogram_results = histogram(image, input_size);
 	for(unsigned int i = 0; i < 256 * 3; ++i) {
@@ -55,7 +62,6 @@ int main(int argc, char const *argv[]) {
 		outFile << histogram_results[i]<< ' ';
 	}
 
-	inFile.close();
 	outFile.close();
 
 	return 0;
