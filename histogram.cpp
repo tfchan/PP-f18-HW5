@@ -11,7 +11,7 @@ char* readKernelSource(const char *filename) {
 	size_t size;
 	char *source;
 
-	FILE *f = fopen(filename, "r");
+	FILE *f = fopen(filename, "rb");
 	if (!f) {
 		std::cout << "Cannot open kernel source file " << kernel_source_filename << "\n";
 		exit(EXIT_FAILURE);
@@ -61,6 +61,18 @@ unsigned int * histogram(unsigned int *image_data, unsigned int _size) {
 	program = clCreateProgramWithSource(context, 1, (const char **)&kernel_source, NULL, &error_num);
 	if (error_num != CL_SUCCESS) {
 		std::cout << "Fail to create program with source\n";
+		exit(EXIT_FAILURE);
+	}
+
+	// Build the program
+	error_num = clBuildProgram(program, 1, &device_id, NULL, NULL, NULL);
+	if (error_num != CL_SUCCESS) {
+		std::cout << "Fail to build program\n";
+		char buffer[1000];
+		error_num = clGetProgramBuildInfo(program, device_id, CL_PROGRAM_BUILD_LOG, sizeof(buffer), buffer, NULL);
+		if (error_num != CL_SUCCESS) 
+			std::cout << "Fail to get build info\n";
+		std::cout << buffer << "\n";
 		exit(EXIT_FAILURE);
 	}
 
