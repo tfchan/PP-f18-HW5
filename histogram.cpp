@@ -35,6 +35,7 @@ unsigned int * histogram(unsigned int *image_data, unsigned int _size) {
 	cl_command_queue command_queue;
 	char *kernel_source;
 	cl_program program;
+	cl_kernel kernel;
 
 	// Get a GPU device ID
 	error_num = clGetDeviceIDs(NULL, CL_DEVICE_TYPE_GPU, 1, &device_id, NULL);
@@ -75,6 +76,13 @@ unsigned int * histogram(unsigned int *image_data, unsigned int _size) {
 		if (error_num != CL_SUCCESS) 
 			std::cout << "Fail to get build info\n";
 		std::cout << buffer << "\n";
+		exit(EXIT_FAILURE);
+	}
+
+	// Create kernel for the program
+	kernel = clCreateKernel(program, "histogramKernel", &error_num);
+	if (error_num != CL_SUCCESS) {
+		std::cout << "Fail to create kernel\n";
 		exit(EXIT_FAILURE);
 	}
 
