@@ -149,7 +149,8 @@ unsigned int * histogram(unsigned int *image_data, unsigned int _size) {
 		ptr[index]++;
 	}
 
-	error_num = clEnqueueReadBuffer(command_queue, device_histogram_result, CL_FALSE, 0, 256 * 3 * sizeof(unsigned int), ref_histogram_results, 0, NULL, NULL);
+	// Read histogram result back from device to host after kernel event
+	error_num = clEnqueueReadBuffer(command_queue, device_histogram_result, CL_FALSE, 0, 256 * 3 * sizeof(unsigned int), ref_histogram_results, 1, &kernel_event, NULL);
 	if (error_num != CL_SUCCESS) {
 		std::cout << "Fail to enqueue read buffer\n";
 		exit(EXIT_FAILURE);
