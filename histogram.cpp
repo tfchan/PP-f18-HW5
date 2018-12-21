@@ -5,6 +5,8 @@
 #include <iostream>
 #include <CL/cl.h>
 
+const char *input_filename = "input";
+const char *output_filename = "0756002.out";
 const char *kernel_source_filename = "histogram.cl";
 
 char* readKernelSource(const char *filename) {
@@ -182,11 +184,11 @@ int main(int argc, char const *argv[]) {
 	unsigned int *image, input_size;
 	unsigned int *histogram_results;
 
-	input_size = readInput(&image, "input");
+	input_size = readInput(&image, input_filename);
 
 	histogram_results = histogram(image, input_size);
 
-	writeResult(histogram_results, "0756002.out");
+	writeResult(histogram_results, output_filename);
 
 	delete [] image;
 	delete [] histogram_results;
