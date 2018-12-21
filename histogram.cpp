@@ -123,6 +123,13 @@ unsigned int * histogram(unsigned int *image_data, unsigned int _size) {
 		ptr[index]++;
 	}
 
+	// Release resources
+	clReleaseKernel(kernel);
+	clReleaseProgram(program);
+	clReleaseMemObject(device_histogram_result);
+	clReleaseMemObject(device_image);
+	clReleaseCommandQueue(command_queue);
+	clReleaseContext(context);
 	return ref_histogram_results;
 }
 
