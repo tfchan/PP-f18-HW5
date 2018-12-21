@@ -123,6 +123,9 @@ unsigned int * histogram(unsigned int *image_data, unsigned int _size) {
 		ptr[index]++;
 	}
 
+	// Submit all command in queue and wait for completion
+	clFlush(command_queue);
+	clFinish(command_queue);
 	// Release resources
 	clReleaseKernel(kernel);
 	clReleaseProgram(program);
