@@ -44,21 +44,21 @@ unsigned int * histogram(unsigned int *image_data, unsigned int _size) {
 	// Get a GPU device ID
 	error_num = clGetDeviceIDs(NULL, CL_DEVICE_TYPE_GPU, 1, &device_id, NULL);
 	if (error_num != CL_SUCCESS) {
-		std::cout << "Fail to get device ID\n";
+		std::cout << error_num << " Fail to get device ID\n";
 		exit(EXIT_FAILURE);
 	}
 
 	// Create a context with the GPU device we got above
 	context = clCreateContext(NULL, 1, &device_id, NULL, NULL, &error_num);
 	if (error_num != CL_SUCCESS) {
-		std::cout << "Fail to create context\n";
+		std::cout << error_num << " Fail to create context\n";
 		exit(EXIT_FAILURE);
 	}
 
 	// Create a command queue with the device in the context
 	command_queue = clCreateCommandQueueWithProperties(context, device_id, NULL, &error_num);
 	if (error_num != CL_SUCCESS) {
-		std::cout << "Fail to create command queue\n";
+		std::cout << error_num << " Fail to create command queue\n";
 		exit(EXIT_FAILURE);
 	}
 
@@ -66,14 +66,14 @@ unsigned int * histogram(unsigned int *image_data, unsigned int _size) {
 	device_image = clCreateBuffer(context, CL_MEM_READ_ONLY, _size * sizeof(unsigned int), NULL, &error_num);
 	device_histogram_result = clCreateBuffer(context, CL_MEM_READ_WRITE, 256 * 3 * sizeof(unsigned int), NULL, &error_num);
 	if (device_image == NULL || device_histogram_result == NULL) {
-		std::cout << "Fail to create buffer\n";
+		std::cout << error_num << " Fail to create buffer\n";
 		exit(EXIT_FAILURE);
 	}
 
 	// Copy image data to device buffer
 	error_num = clEnqueueWriteBuffer(command_queue, device_image, CL_FALSE, 0, _size * sizeof(unsigned int), image_data, 0, NULL, &write_event);
 	if (error_num != CL_SUCCESS) {
-		std::cout << "Fail to enqueue write buffer\n";
+		std::cout << error_num << " Fail to enqueue write buffer\n";
 		exit(EXIT_FAILURE);
 	}
 
@@ -81,7 +81,7 @@ unsigned int * histogram(unsigned int *image_data, unsigned int _size) {
 	kernel_source = readKernelSource(kernel_source_filename);
 	program = clCreateProgramWithSource(context, 1, (const char **)&kernel_source, NULL, &error_num);
 	if (error_num != CL_SUCCESS) {
-		std::cout << "Fail to create program with source\n";
+		std::cout << error_num << " Fail to create program with source\n";
 		exit(EXIT_FAILURE);
 	}
 	delete [] kernel_source;
@@ -89,11 +89,11 @@ unsigned int * histogram(unsigned int *image_data, unsigned int _size) {
 	// Build the program
 	error_num = clBuildProgram(program, 1, &device_id, NULL, NULL, NULL);
 	if (error_num != CL_SUCCESS) {
-		std::cout << "Fail to build program\n";
+		std::cout << error_num << " Fail to build program\n";
 		char buffer[1000];
 		error_num = clGetProgramBuildInfo(program, device_id, CL_PROGRAM_BUILD_LOG, sizeof(buffer), buffer, NULL);
 		if (error_num != CL_SUCCESS) 
-			std::cout << "Fail to get build info\n";
+			std::cout << error_num << " Fail to get build info\n";
 		std::cout << buffer << "\n";
 		exit(EXIT_FAILURE);
 	}
@@ -101,7 +101,7 @@ unsigned int * histogram(unsigned int *image_data, unsigned int _size) {
 	// Create kernel for the program
 	kernel = clCreateKernel(program, "histogramKernel", &error_num);
 	if (error_num != CL_SUCCESS) {
-		std::cout << "Fail to create kernel\n";
+		std::cout << error_num << " Fail to create kernel\n";
 		exit(EXIT_FAILURE);
 	}
 
@@ -110,14 +110,14 @@ unsigned int * histogram(unsigned int *image_data, unsigned int _size) {
 	error_num |= clSetKernelArg(kernel, 1, sizeof(cl_mem), &device_histogram_result);
 	error_num |= clSetKernelArg(kernel, 2, sizeof(unsigned int), &_size);
 	if (error_num != CL_SUCCESS) {
-		std::cout << "Fail to set kernel arguments\n";
+		std::cout << error_num << " Fail to set kernel arguments\n";
 		exit(EXIT_FAILURE);
 	}
 
 	// Enqueue kernel execution command which execute after write event
 	error_num = clEnqueueNDRangeKernel(command_queue, kernel, 1, NULL, &global_size, &local_size, 1, &write_event, &kernel_event);
 	if (error_num != CL_SUCCESS) {
-		std::cout << "Fail to enqueue kernel\n";
+		std::cout << error_num << " Fail to enqueue kernel\n";
 		exit(EXIT_FAILURE);
 	}
 
@@ -152,7 +152,7 @@ unsigned int * histogram(unsigned int *image_data, unsigned int _size) {
 	// Read histogram result back from device to host after kernel event
 	error_num = clEnqueueReadBuffer(command_queue, device_histogram_result, CL_FALSE, 0, 256 * 3 * sizeof(unsigned int), ref_histogram_results, 1, &kernel_event, NULL);
 	if (error_num != CL_SUCCESS) {
-		std::cout << "Fail to enqueue read buffer\n";
+		std::cout << error_num << " Fail to enqueue read buffer\n";
 		exit(EXIT_FAILURE);
 	}
 
