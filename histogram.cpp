@@ -121,6 +121,7 @@ unsigned int * histogram(unsigned int *image_data, unsigned int _size) {
 	}
 
 	// Enqueue kernel execution command which execute after write event
+	global_size = (_size % local_size == 0) ? (_size) : ((_size / local_size + 1) * local_size);
 	error_num = clEnqueueNDRangeKernel(command_queue, kernel, 1, NULL, &global_size, &local_size, 1, &write_event, &kernel_event);
 	if (error_num != CL_SUCCESS) {
 		std::cout << error_num << " Fail to enqueue kernel\n";
