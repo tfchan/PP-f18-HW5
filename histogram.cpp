@@ -103,6 +103,15 @@ unsigned int * histogram(unsigned int *image_data, unsigned int _size) {
 		exit(EXIT_FAILURE);
 	}
 
+	// Set kernel arguments
+	error_num = clSetKernelArg(kernel, 0, sizeof(cl_mem), &device_image);
+	error_num |= clSetKernelArg(kernel, 1, sizeof(cl_mem), &device_histogram_result);
+	error_num |= clSetKernelArg(kernel, 2, sizeof(unsigned int), &_size);
+	if (error_num != CL_SUCCESS) {
+		std::cout << "Fail to set kernel arguments\n";
+		exit(EXIT_FAILURE);
+	}
+
 	unsigned int *img = image_data;
 	unsigned int *ref_histogram_results;
 	unsigned int *ptr;
