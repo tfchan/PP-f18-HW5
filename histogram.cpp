@@ -38,13 +38,19 @@ unsigned int * histogram(unsigned int *image_data, unsigned int _size) {
 	char *kernel_source;
 	cl_program program;
 	cl_kernel kernel;
-	size_t global_size = 8;
-	size_t local_size = 2;
+	size_t global_size, local_size;
 
 	// Get a GPU device ID
 	error_num = clGetDeviceIDs(NULL, CL_DEVICE_TYPE_GPU, 1, &device_id, NULL);
 	if (error_num != CL_SUCCESS) {
 		std::cout << error_num << " Fail to get device ID\n";
+		exit(EXIT_FAILURE);
+	}
+
+	// Get maximum work-items size in a work group
+	error_num = clGetDeviceInfo(device_id, CL_DEVICE_MAX_WORK_GROUP_SIZE, sizeof(local_size), &local_size, NULL);
+	if (error_num != CL_SUCCESS) {
+		std::cout << error_num << " Fail to get device info\n";
 		exit(EXIT_FAILURE);
 	}
 
