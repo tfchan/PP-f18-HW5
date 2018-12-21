@@ -34,10 +34,12 @@ unsigned int * histogram(unsigned int *image_data, unsigned int _size) {
 	cl_context context;
 	cl_command_queue command_queue;
 	cl_mem device_image, device_histogram_result;
-	cl_event write_event;
+	cl_event write_event, kernel_event;
 	char *kernel_source;
 	cl_program program;
 	cl_kernel kernel;
+	size_t global_size = 8;
+	size_t local_size = 2;
 
 	// Get a GPU device ID
 	error_num = clGetDeviceIDs(NULL, CL_DEVICE_TYPE_GPU, 1, &device_id, NULL);
@@ -109,6 +111,13 @@ unsigned int * histogram(unsigned int *image_data, unsigned int _size) {
 	error_num |= clSetKernelArg(kernel, 2, sizeof(unsigned int), &_size);
 	if (error_num != CL_SUCCESS) {
 		std::cout << "Fail to set kernel arguments\n";
+		exit(EXIT_FAILURE);
+	}
+
+	// Enqueue kernel execution command which execute after write event
+	error_num = clEnqueueNDRangeKernel(command_queue, kernel, 1, NULL, &global_size, &local_size, 1, &write_event, &kernel_event);
+	if (error_num != CL_SUCCESS) {
+		std::cout << "Fail to enqueue kernel\n";
 		exit(EXIT_FAILURE);
 	}
 
