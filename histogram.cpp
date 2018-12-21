@@ -39,6 +39,10 @@ unsigned int * histogram(unsigned int *image_data, unsigned int _size) {
 unsigned int readInput(unsigned int **image, const char *filename) {
 	unsigned int i = 0, a, input_size;
 	std::fstream inFile(filename, std::ios_base::in);
+	if (!inFile.is_open) {
+		std::cout << "Cannot open input file: " << filename << "\n";
+		exit(EXIT_FAILURE);
+	}
 	inFile >> input_size;
 	*image = new unsigned int[input_size];
 	while (inFile >> a) {
