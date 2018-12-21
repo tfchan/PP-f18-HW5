@@ -60,7 +60,7 @@ unsigned int * histogram(unsigned int *image_data, unsigned int _size) {
 	}
 
 	// Create buffer for input and output
-	device_image = clCreateBuffer(context, CL_MEM_READ_ONLY, _size, NULL, &error_num);
+	device_image = clCreateBuffer(context, CL_MEM_READ_ONLY, _size * sizeof(unsigned int), NULL, &error_num);
 	device_histogram_result = clCreateBuffer(context, CL_MEM_READ_WRITE, 256 * 3 * sizeof(unsigned int), NULL, &error_num);
 	if (device_image == NULL || device_histogram_result == NULL) {
 		std::cout << "Fail to create buffer\n";
