@@ -182,5 +182,8 @@ int main(int argc, char const *argv[]) {
 
 	writeResult(histogram_results, "0756002.out");
 
+	delete [] image;
+	delete [] histogram_results;
+
 	return 0;
 }
