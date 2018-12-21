@@ -34,6 +34,7 @@ unsigned int * histogram(unsigned int *image_data, unsigned int _size) {
 	cl_context context;
 	cl_command_queue command_queue;
 	cl_mem device_image, device_histogram_result;
+	cl_event write_event;
 	char *kernel_source;
 	cl_program program;
 	cl_kernel kernel;
@@ -64,6 +65,13 @@ unsigned int * histogram(unsigned int *image_data, unsigned int _size) {
 	device_histogram_result = clCreateBuffer(context, CL_MEM_READ_WRITE, 256 * 3 * sizeof(unsigned int), NULL, &error_num);
 	if (device_image == NULL || device_histogram_result == NULL) {
 		std::cout << "Fail to create buffer\n";
+		exit(EXIT_FAILURE);
+	}
+
+	// Copy image data to device buffer
+	error_num = clEnqueueWriteBuffer(command_queue, device_image, CL_FALSE, 0, _size * sizeof(unsigned int), image_data, 0, NULL, &write_event);
+	if (error_num != CL_SUCCESS) {
+		std::cout << "Fail to enqueue write buffer\n";
 		exit(EXIT_FAILURE);
 	}
 
